@@ -5,7 +5,8 @@ public class UTECECourses {
 
 	/* 
 	 * Please send me data for all the power courses!!!
-	 */
+	 Hello, 'tis me, the power queen
+*/
 	public static HashMap<String,Course> initialize() {
 			HashMap<String,Course> courses = new HashMap<String,Course>();
 			courses.put("EE445L", new Course("EE445L",7.5));
@@ -21,8 +22,7 @@ public class UTECECourses {
 			courses.put("EE438", new Course("EE438",3.5));
 			courses.put("EE440", new Course("EE440",3.5));
 			courses.put("EE460R", new Course("EE460R",7));
-			courses.put("EE362K", new Course("EE362K",2.5));
-			courses.put("EE312", new Course("EE312",3)); 
+			courses.put("EE312", new Course("EE312",3));
 			courses.put("EE313", new Course("EE313",3));
 			courses.put("EE411", new Course("EE411",3)); 
 			courses.put("EE338L", new Course("EE338L",-1));
@@ -36,9 +36,9 @@ public class UTECECourses {
 			courses.put("EE360C", new Course("EE360C",4));
 			courses.put("EE360P", new Course("EE360P",3));
 			courses.put("EE361C", new Course("EE361C",3.5));
-			courses.put("EE362S", new Course("EE362S",-1));
+			courses.put("EE362S", new Course("EE362S",2.5));
 			courses.put("EE363N", new Course("EE363N",-1));
-			courses.put("EE362Q", new Course("EE362Q",-1));
+			courses.put("EE362Q", new Course("EE362Q",5));
 			courses.put("EE339", new Course("EE339",4));
 			courses.put("EE325", new Course("EE325",4.5));
 			courses.put("EE351K", new Course("EE351K",5.5));
@@ -63,6 +63,14 @@ public class UTECECourses {
 			courses.put("PHY103M", new Course("PHY103M",2));
 			courses.put("PHY303L", new Course("PHY303L",2));
 			courses.put("PHY103N", new Course("PHY103N",1));
+			courses.put("EE341", new Course("EE341", 5.5);
+			courses.put("EE369", new Course("EE369", 3);
+			courses.put("EE368L", new Course("EE368L", 4);
+			courses.put("EE379K", new Course("EE379K",2); //Smart Grids.
+			courses.put("EE362K", new Course("EE362K", 3);
+			courses.put("EE339S", new Course("EE339S", 5);
+			courses.put("EE362R", new Course("EE362R", 1);
+
 			return courses;
 	}
 
