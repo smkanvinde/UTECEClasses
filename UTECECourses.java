@@ -2,6 +2,10 @@ import java.util.*;
 
 public class UTECECourses {
 
+    /* Course list */
+    protected static HashMap<String,Double> allCourses = courseListInitialize();
+    protected static HashMap<String,Boolean> bermuda = bermudaInitialize();
+
     /* Values for the tiers */
     protected static double riskyLow = 12;
     protected static double nrLow = 16;
@@ -16,8 +20,6 @@ public class UTECECourses {
         Scanner sc = new Scanner(System.in);
 
         while (true){
-            HashMap<String,Double> allCourses = initialize();
-
 			/* Title screen stuff */
             System.out.println("\nWelcome to UTECECourses.");
             System.out.println("Please input your courses in the following format:");
@@ -28,11 +30,7 @@ public class UTECECourses {
             System.out.print(">");
 
 			/* Starred and Bermuda Triangle courses */
-            boolean embsys = false;
-            boolean comparch = false;
-            boolean os = false;
-            boolean vlsi = false;
-            boolean prob = false;
+            bermuda = bermudaInitialize(); //Reinitialize to reset all booleans in case of multiple iterations
 
 			/* Intialize necessary variables */
             String input = sc.nextLine();
@@ -59,19 +57,19 @@ public class UTECECourses {
                     else { //Start error checking/core logic
                         switch (input) {
                             case "EE445L":
-                                embsys = true;
+                                bermuda.put("embsys", true);
                                 break;
                             case "EE460N":
-                                comparch = true;
+                                bermuda.put("comparch", true);
                                 break;
                             case "EE460R":
-                                vlsi = true;
+                                bermuda.put("vlsi", true);
                                 break;
                             case "EE461S":
-                                os = true;
+                                bermuda.put("os", true);
                                 break;
                             case "EE351K":
-                                prob = true;
+                                bermuda.put("prob", true);
                                 break;
                             case "EE422C":
                                 confirmation = getYN("Is Dr. Perry teaching EE422C?", sc);
@@ -118,27 +116,7 @@ public class UTECECourses {
                 }
                 else { //If we are dealing with an EE379K course
                     if (input.equals("EE379K")) {
-                        System.out.println("Please specify:");
-                        System.out.println("0: Smart Grids");
-                        System.out.println("1: High Throughput Nanopatterning");
-                        System.out.println("2: Information Security and Privacy");
-                        System.out.println("3: Data Science Laboratory");
-                        System.out.print(">");
-                        int choice = Integer.parseInt(sc.nextLine());
-                        if (choice == 0) {
-                            String temp = input + "0";
-                            tempDiff = allCourses.get(temp);
-                            totalDiff += tempDiff;
-                        }
-                        else {
-                            System.out.println("That version of EE379K is not in our database.");
-                            System.out.println("Please ask an upperclassman to rank it and enter the score here:");
-                            System.out.print(">");
-                            tempDiff = Double.parseDouble(sc.nextLine());
-                            totalDiff += tempDiff;
-                            System.out.println();
-                            System.out.println("Please add your course to initialize() as an incrementing 'EE379Kx' (x is currently 1) and submit a pull request after this run.");
-                        }
+                        totalDiff += handlerFor379K(sc);
                     }
                     else { //If course is not defined in initialize method
                         System.out.println(input + " is not in our database.");
@@ -166,20 +144,20 @@ public class UTECECourses {
             }
 
 			/* Bermuda Triangle warning */
-            int bermuda = 0;
-            if (embsys) bermuda++;
-            if (comparch) bermuda++;
-            if (os) bermuda++;
-            if (bermuda > 1 || prob || vlsi) {
+            int bermudaCount = 0;
+            if (bermuda.get("embsys")) bermudaCount++;
+            if (bermuda.get("comparch")) bermudaCount++;
+            if (bermuda.get("os")) bermudaCount++;
+            if (bermudaCount > 1 || bermuda.get("prob") || bermuda.get("vlsi")) {
                 System.out.println();
                 System.out.println("The Bermuda Triangle of EE:");
                 System.out.println("EE460N");
                 System.out.println("EE445L");
                 System.out.println("EE461S");
                 System.out.println("Only take ONE of these at a time.");
-                if (prob)
+                if (bermuda.get("prob"))
                     System.out.println("EE351K is manageable with ONE of the Bermuda Triangle.");
-                if (vlsi)
+                if (bermuda.get("vlsi"))
                     System.out.println("EE460R can be considered equivalent to any of the Bermuda Triangle.");
             }
 
@@ -206,7 +184,7 @@ public class UTECECourses {
     }
 
     /************************************************************
-     * @name: initialize                                        *
+     * @name: courseListInitialize                              *
      * @description: Prepare the list of course and their       *
      * weights for the rest of the script to utilize.           *
      * @notes: Update as needed!!!                              *
@@ -214,7 +192,7 @@ public class UTECECourses {
      * been assigned a weight of -1.                            *
      ***********************************************************/
 
-    public static HashMap<String,Double> initialize() {
+    public static HashMap<String,Double> courseListInitialize() {
         HashMap<String,Double> courses = new HashMap<>();
         courses.put("EE445L",  7.5);
         courses.put("EE460N",  6.0);
@@ -283,6 +261,24 @@ public class UTECECourses {
     }
 
     /************************************************************
+     * @name: bermudaInitialize                                 *
+     * @description: Prepare the list of starred and bermuda    *
+     * courses to use for logic in main.                        *
+     * @notes: Update as needed!!!                              *
+     ***********************************************************/
+    protected static HashMap<String, Boolean> bermudaInitialize() {
+        HashMap<String, Boolean> bermudaCourses = new HashMap<>();
+
+        bermudaCourses.put("embsys", false);
+        bermudaCourses.put("comparch", false);
+        bermudaCourses.put("os", false);
+        bermudaCourses.put("vlsi", false);
+        bermudaCourses.put("prob", false);
+
+        return bermudaCourses;
+    }
+
+    /************************************************************
      * @name: getYN                                             *
      * @params: prompt, sc                                      *
      * @description: Asks for confirmation from user for given  *
@@ -310,5 +306,38 @@ public class UTECECourses {
         } while (!input.equals("Y") && !input.equals("N"));
 
         return input;
+    }
+
+    /************************************************************
+     * @name: handlerFor379K                                    *
+     * @params: sc                                              *
+     * @description: If it's a 379K course, then use this       *
+     * "special" logic.                                         *
+     ***********************************************************/
+    protected static double handlerFor379K(Scanner sc) {
+        /* First need to know which 379K */
+        System.out.println("Please specify:");
+        System.out.println("0: Smart Grids");
+        System.out.println("1: High Throughput Nanopatterning");
+        System.out.println("2: Information Security and Privacy");
+        System.out.println("3: Data Science Laboratory");
+        System.out.print(">");
+        int choice = Integer.parseInt(sc.nextLine());
+
+        /* If it's a choice that exists, return that value */
+        switch(choice) {
+            case 0:
+                return allCourses.get("EE379K0");
+            default:
+                break;
+        }
+
+        /* Else prompt user to enter a score */
+        System.out.println("That version of EE379K is not in our database.");
+        System.out.println("Please ask an upperclassman to rank it and enter the score here:");
+        System.out.print(">");
+        double temp = Double.parseDouble(sc.nextLine()); //Just to make sure below line prints properly
+        System.out.println("\nPlease add your course to initialize() as an incrementing 'EE379Kx' (x is currently 1) and submit a pull request after this run.");
+        return temp;
     }
 }
