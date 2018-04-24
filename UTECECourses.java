@@ -34,7 +34,6 @@ public class UTECECourses {
 
 			/* Intialize necessary variables */
             String input = sc.nextLine();
-            String confirmation;
             input = input.toUpperCase();
             input = input.replaceAll("\\s+","");
             double totalDiff = 0;
@@ -43,9 +42,8 @@ public class UTECECourses {
 			/* Begin parsing */
             while(!input.equals("D")) {
                 if (allCourses.containsKey(input))  {
-                    //be able to get the course by here
-                    tempDiff = allCourses.get(input);
-                    if (tempDiff == -1) {
+                    tempDiff = allCourses.get(input); //Initialize the weight
+                    if (tempDiff == -1) { //Should the class have no assigned weight
                         System.out.println("We do not have data for " + input + ".");
                         System.out.println("Please ask an upperclassman to rank it and enter the score here:");
                         System.out.print(">");
@@ -54,63 +52,10 @@ public class UTECECourses {
                         System.out.println();
                         System.out.println("Please update " + input + "'s entry in initialize() and submit a pull request after this run.");
                     }
-                    else { //Start error checking/core logic
-                        switch (input) {
-                            case "EE445L":
-                                bermuda.put("embsys", true);
-                                break;
-                            case "EE460N":
-                                bermuda.put("comparch", true);
-                                break;
-                            case "EE460R":
-                                bermuda.put("vlsi", true);
-                                break;
-                            case "EE461S":
-                                bermuda.put("os", true);
-                                break;
-                            case "EE351K":
-                                bermuda.put("prob", true);
-                                break;
-                            case "EE422C":
-                                confirmation = getYN("Is Dr. Perry teaching EE422C?", sc);
-                                if (confirmation.equals("Y")) {
-                                    tempDiff -= 1.5;
-                                }
-                                break;
-                            case "EE411":
-                                confirmation = getYN("Is Dr. Swartzlander teaching EE411?", sc);
-                                if (confirmation.equals("Y")) {
-                                    tempDiff -= 2;
-                                }
-                                break;
-                            case "EE312":
-                                confirmation = getYN("Is Dr. Chase teaching EE312?", sc);
-                                if (confirmation.equals("Y")) {
-                                    tempDiff += 1;
-                                }
-                                break;
-                            case "EE302":
-                                confirmation = getYN("Did you do circuits in high school?", sc);
-                                if (confirmation.equals("N")) {
-                                    tempDiff += 1;
-                                }
-                                break;
-                            case "EE306":
-                                confirmation = getYN("Have you ever programmed?", sc);
-                                if (confirmation.equals("N")) {
-                                    tempDiff += 1;
-                                }
-                                confirmation = getYN("Is Dr. Patt teaching EE306?", sc);
-                                if (confirmation.equals("Y")) {
-                                    tempDiff += 1;
-                                }
-                                break;
-                            case "EE333T":
-                                confirmation = getYN("Is EE333T abroad?", sc);
-                                if (confirmation.equals("Y")) {
-                                    tempDiff -= 2.5;
-                                }
-                        }
+                    else { //Adjust the weight if needed and account for special courses
+                        bermudaChecker(input); //Check if a bermuda course was entered
+                        tempDiff += profException(sc, input); //Adjust the course weight depending on professor taken
+                        tempDiff += priorExperience(sc, input); //Account for high school experience
                         totalDiff += tempDiff;
                     }
                 }
@@ -136,30 +81,10 @@ public class UTECECourses {
                 input = input.toUpperCase();
             }
 
-            String fresh = getYN("Are you a freshman?", sc);
-            if (fresh.equals("Y")) {
-                riskyLow = 10;
-                nrLow = 14;
-                ded = 18;
-            }
+            freshmanHandler(sc);
 
 			/* Bermuda Triangle warning */
-            int bermudaCount = 0;
-            if (bermuda.get("embsys")) bermudaCount++;
-            if (bermuda.get("comparch")) bermudaCount++;
-            if (bermuda.get("os")) bermudaCount++;
-            if (bermudaCount > 1 || bermuda.get("prob") || bermuda.get("vlsi")) {
-                System.out.println();
-                System.out.println("The Bermuda Triangle of EE:");
-                System.out.println("EE460N");
-                System.out.println("EE445L");
-                System.out.println("EE461S");
-                System.out.println("Only take ONE of these at a time.");
-                if (bermuda.get("prob"))
-                    System.out.println("EE351K is manageable with ONE of the Bermuda Triangle.");
-                if (bermuda.get("vlsi"))
-                    System.out.println("EE460R can be considered equivalent to any of the Bermuda Triangle.");
-            }
+			bermudaHandler();
 
 			/* Final score determined */
             System.out.println("Your score is " + totalDiff);
@@ -279,33 +204,142 @@ public class UTECECourses {
     }
 
     /************************************************************
-     * @name: getYN                                             *
-     * @params: prompt, sc                                      *
-     * @description: Asks for confirmation from user for given  *
-     * prompt.                                                  *
+     * @name: bermudaChecker                                    *
+     * @description: Updates the hashmap of bermuda courses     *
+     * should the user have taken any of these courses.         *
+     * @notes: Update as needed!!!                              *
      ***********************************************************/
-    public static String getYN(String prompt, Scanner sc) {
-        boolean first = true;
-        String input;
+    protected static void bermudaChecker(String course) {
+        switch (course) {
+            case "EE445L":
+                bermuda.put("embsys", true);
+                break;
+            case "EE460N":
+                bermuda.put("comparch", true);
+                break;
+            case "EE460R":
+                bermuda.put("vlsi", true);
+                break;
+            case "EE461S":
+                bermuda.put("os", true);
+                break;
+            case "EE351K":
+                bermuda.put("prob", true);
+                break;
+        }
+    }
 
-        do {
-            if (!first) {
-                System.out.println("Y/N, dumbass.");
-            }
-
+    /************************************************************
+     * @name: bermudaHandler                                    *
+     * @description: Warns user if they took multiple bermudas  *
+     * or probability (EE351K).                                 *
+     * @notes: Update as needed!!!                              *
+     ***********************************************************/
+    protected static void bermudaHandler() {
+        int bermudaCount = 0;
+        if (bermuda.get("embsys")) bermudaCount++;
+        if (bermuda.get("comparch")) bermudaCount++;
+        if (bermuda.get("os")) bermudaCount++;
+        if (bermudaCount > 1 || bermuda.get("prob") || bermuda.get("vlsi")) {
             System.out.println();
-            System.out.print(prompt);
-            System.out.println(" Y/N");
-            System.out.print(">");
+            System.out.println("The Bermuda Triangle of EE:");
+            System.out.println("EE460N");
+            System.out.println("EE445L");
+            System.out.println("EE461S");
+            System.out.println("Only take ONE of these at a time.");
+            if (bermuda.get("prob"))
+                System.out.println("EE351K is manageable with ONE of the Bermuda Triangle.");
+            if (bermuda.get("vlsi"))
+                System.out.println("EE460R can be considered equivalent to any of the Bermuda Triangle.");
+        }
+    }
 
-            input = sc.nextLine();
-            input = input.toUpperCase();
-            input = input.replaceAll("\\s+","");
+    /************************************************************
+     * @name: profException                                     *
+     * @description: Returns the delta weight for a course,     *
+     * should a specific professor for a given course affect    *
+     * that.                                                    *
+     * @notes: Update as needed!!!                              *
+     ***********************************************************/
+    protected static double profException(Scanner sc, String course) {
+        String confirmation;
+        switch(course) {
+            case "EE422C":
+                confirmation = getYN("Is Dr. Perry teaching EE422C?", sc);
+                if (confirmation.equals("Y")) {
+                    return -1.5;
+                }
+                break;
+            case "EE411":
+                confirmation = getYN("Is Dr. Swartzlander teaching EE411?", sc);
+                if (confirmation.equals("Y")) {
+                    return -2;
+                }
+                break;
+            case "EE312":
+                confirmation = getYN("Is Dr. Chase teaching EE312?", sc);
+                if (confirmation.equals("Y")) {
+                    return 1;
+                }
+                break;
+            case "EE306":
+                confirmation = getYN("Is Dr. Patt teaching EE306?", sc);
+                if (confirmation.equals("Y")) {
+                    return 1;
+                }
+                break;
+            case "EE333T":
+                confirmation = getYN("Is EE333T abroad?", sc);
+                if (confirmation.equals("Y")) {
+                    return -2.5;
+                }
+                break;
+            default: //For the sake of completeness
+                break;
+        }
+        return 0; //No weight change, if none of the above is confirmed
+    }
 
-            first = false;
-        } while (!input.equals("Y") && !input.equals("N"));
+    /************************************************************
+     * @name: priorExperience                                   *
+     * @description: Returns the weight delta needed, according *
+     * to their high school experience.                         *
+     * @notes: Update as needed!!!                              *
+     ***********************************************************/
+    protected static double priorExperience(Scanner sc, String course) {
+        String confirmation;
+        switch(course) {
+            case "EE302":
+                confirmation = getYN("Did you do circuits in high school?", sc);
+                if (confirmation.equals("N")) {
+                    return 1;
+                }
+                break;
+            case "EE306":
+                confirmation = getYN("Have you ever programmed?", sc);
+                if (confirmation.equals("N")) {
+                    return 1;
+                }
+                break;
+            default: //For the sake of completeness
+                break;
+        }
+        return 0; //No weight change, if none of the above is confirmed
+    }
 
-        return input;
+    /************************************************************
+     * @name: freshmanHandler                                   *
+     * @params: sc                                              *
+     * @description: Return the delta weight, should the user   *
+     * be a freshman.                                           *
+     ***********************************************************/
+    protected static void freshmanHandler(Scanner sc) {
+        String fresh = getYN("Are you a freshman?", sc);
+        if (fresh.equals("Y")) {
+            riskyLow = 10;
+            nrLow = 14;
+            ded = 18;
+        }
     }
 
     /************************************************************
@@ -339,5 +373,35 @@ public class UTECECourses {
         double temp = Double.parseDouble(sc.nextLine()); //Just to make sure below line prints properly
         System.out.println("\nPlease add your course to initialize() as an incrementing 'EE379Kx' (x is currently 1) and submit a pull request after this run.");
         return temp;
+    }
+
+    /************************************************************
+     * @name: getYN                                             *
+     * @params: prompt, sc                                      *
+     * @description: Asks for confirmation from user for given  *
+     * prompt.                                                  *
+     ***********************************************************/
+    public static String getYN(String prompt, Scanner sc) {
+        boolean first = true;
+        String input;
+
+        do {
+            if (!first) {
+                System.out.println("Y/N, dumbass.");
+            }
+
+            System.out.println();
+            System.out.print(prompt);
+            System.out.println(" Y/N");
+            System.out.print(">");
+
+            input = sc.nextLine();
+            input = input.toUpperCase();
+            input = input.replaceAll("\\s+","");
+
+            first = false;
+        } while (!input.equals("Y") && !input.equals("N"));
+
+        return input;
     }
 }
