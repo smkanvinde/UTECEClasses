@@ -43,31 +43,33 @@ public class UTECECourses {
             input = input.toUpperCase();
             input = input.replaceAll("\\s+","");
             double totalDiff = 0;
-            double tempDiff;
+            double tempDiff = 0;
 
 			/* Begin parsing */
             while(!input.equals("D")) {
                 if (allCourses.containsKey(input))  {
                     tempDiff = allCourses.get(input); //Initialize the weight
                     if (tempDiff == -1) { //Should the class have no assigned weight
-                        totalDiff += addWeight(sc, input, true);
+                        tempDiff += addWeight(sc, input, true);
                         System.out.println("\nPlease update " + input + "'s entry in initialize() and submit a pull request after this run.");
                     }
                     else { //Adjust the weight if needed and account for special courses
                         bermudaChecker(input); //Check if a bermuda course was entered
-                        totalDiff += profException(sc, input); //Adjust the course weight depending on professor taken
-                        totalDiff += priorExperience(sc, input); //Account for high school experience
+                        tempDiff += profException(sc, input); //Adjust the course weight depending on professor taken
+                        tempDiff += priorExperience(sc, input); //Account for high school experience
                     }
                 }
                 else { //If we are dealing with an EE379K course
                     if (input.equals("EE379K")) {
-                        totalDiff += handlerFor379K(sc);
+                        tempDiff += handlerFor379K(sc);
                     }
                     else { //If course is not defined in initialize method
-                        totalDiff += addWeight(sc, input, false);
+                        tempDiff += addWeight(sc, input, false);
                         System.out.println("\nPlease add your course to initialize() and submit a pull request after this run.");
                     }
                 }
+
+                totalDiff += tempDiff; //Update the total
 
 				/* Ask for next input */
                 System.out.print("\nNext >");
