@@ -20,6 +20,12 @@ public class UTECECourses {
         Scanner sc = new Scanner(System.in);
 
         while (true){
+
+            /* Reset the tier values (needed due to freshmanChecker()) */
+            riskyLow = 12;
+            nrLow = 16;
+            ded = 20;
+
 			/* Title screen stuff */
             System.out.println("\nWelcome to UTECECourses.");
             System.out.println("Please input your courses in the following format:");
@@ -44,19 +50,13 @@ public class UTECECourses {
                 if (allCourses.containsKey(input))  {
                     tempDiff = allCourses.get(input); //Initialize the weight
                     if (tempDiff == -1) { //Should the class have no assigned weight
-                        System.out.println("We do not have data for " + input + ".");
-                        System.out.println("Please ask an upperclassman to rank it and enter the score here:");
-                        System.out.print(">");
-                        tempDiff = Double.parseDouble(sc.nextLine());
-                        totalDiff += tempDiff;
-                        System.out.println();
-                        System.out.println("Please update " + input + "'s entry in initialize() and submit a pull request after this run.");
+                        totalDiff += addWeight(sc, input, true);
+                        System.out.println("\nPlease update " + input + "'s entry in initialize() and submit a pull request after this run.");
                     }
                     else { //Adjust the weight if needed and account for special courses
                         bermudaChecker(input); //Check if a bermuda course was entered
-                        tempDiff += profException(sc, input); //Adjust the course weight depending on professor taken
-                        tempDiff += priorExperience(sc, input); //Account for high school experience
-                        totalDiff += tempDiff;
+                        totalDiff += profException(sc, input); //Adjust the course weight depending on professor taken
+                        totalDiff += priorExperience(sc, input); //Account for high school experience
                     }
                 }
                 else { //If we are dealing with an EE379K course
@@ -64,13 +64,8 @@ public class UTECECourses {
                         totalDiff += handlerFor379K(sc);
                     }
                     else { //If course is not defined in initialize method
-                        System.out.println(input + " is not in our database.");
-                        System.out.println("Please ask an upperclassman to rank it and enter the score here:");
-                        System.out.print(">");
-                        tempDiff = Double.parseDouble(sc.nextLine());
-                        totalDiff += tempDiff;
-                        System.out.println();
-                        System.out.println("Please add your course to initialize() and submit a pull request after this run.");
+                        totalDiff += addWeight(sc, input, false);
+                        System.out.println("\nPlease add your course to initialize() and submit a pull request after this run.");
                     }
                 }
 
@@ -81,6 +76,7 @@ public class UTECECourses {
                 input = input.toUpperCase();
             }
 
+            /* If you're a freshman, adjust the scale */
             freshmanHandler(sc);
 
 			/* Bermuda Triangle warning */
@@ -403,5 +399,26 @@ public class UTECECourses {
         } while (!input.equals("Y") && !input.equals("N"));
 
         return input;
+    }
+
+    /************************************************************
+     * @name: addWeight                                         *
+     * @params: prompt, sc                                      *
+     * @description: Asks user to enter info if course has no   *
+     * assigned weight or if course is not in list.             *
+     ***********************************************************/
+    private static double addWeight(Scanner sc, String course, boolean defined) {
+        if (defined) { //If course is in list but does not have assigned weight
+            System.out.println("We do not have data for " + course + ".");
+            System.out.println("Please ask an upperclassman to rank it and enter the score here:");
+            System.out.print(">");
+            return Double.parseDouble(sc.nextLine());
+        }
+        else {
+            System.out.println(course + " is not in our database.");
+            System.out.println("Please ask an upperclassman to rank it and enter the score here:");
+            System.out.print(">");
+            return Double.parseDouble(sc.nextLine());
+        }
     }
 }
