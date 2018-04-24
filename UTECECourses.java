@@ -90,6 +90,14 @@ public class UTECECourses {
 			courses.put("PHY103M", 2.0);
 			courses.put("PHY303L", 2.0);
 			courses.put("PHY103N", 1.0);
+			courses.put("EE341",   5.5);
+            courses.put("EE369",   3.0);
+            courses.put("EE368L",  4.0);
+            courses.put("EE379K",  2.0); // Smart Grids
+            courses.put("EE362K",  3.0);
+            courses.put("EE339S",  5.0);
+            courses.put("EE362R",  1.0);
+
 			return courses;
 	}
 
