@@ -2,425 +2,313 @@ import java.util.*;
 
 public class UTECECourses {
 
+    /* Values for the tiers */
+    protected static double riskyLow = 12;
+    protected static double nrLow = 16;
+    protected static double ded = 20;
+
+    /************************************************************
+     * @name: main                                              *
+     * @description: All necessary logic for calculating        *
+     * schedule workload.                                       *
+     ***********************************************************/
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+
+        while (true){
+            HashMap<String,Double> allCourses = initialize();
+
+			/* Title screen stuff */
+            System.out.println("\nWelcome to UTECECourses.");
+            System.out.println("Please input your courses in the following format:");
+            System.out.println("[Department(EE,M,PHY)][Course number + optional letter]");
+            System.out.println("Example: EE445L");
+            System.out.println("For senior design, drop the letter.");
+            System.out.println("Please input your courses. Enter D when finished.\n");
+            System.out.print(">");
+
+			/* Starred and Bermuda Triangle courses */
+            boolean embsys = false;
+            boolean comparch = false;
+            boolean os = false;
+            boolean vlsi = false;
+            boolean prob = false;
+
+			/* Intialize necessary variables */
+            String input = sc.nextLine();
+            String confirmation;
+            input = input.toUpperCase();
+            input = input.replaceAll("\\s+","");
+            double totalDiff = 0;
+            double tempDiff;
+
+			/* Begin parsing */
+            while(!input.equals("D")) {
+                if (allCourses.containsKey(input))  {
+                    //be able to get the course by here
+                    tempDiff = allCourses.get(input);
+                    if (tempDiff == -1) {
+                        System.out.println("We do not have data for " + input + ".");
+                        System.out.println("Please ask an upperclassman to rank it and enter the score here:");
+                        System.out.print(">");
+                        tempDiff = Double.parseDouble(sc.nextLine());
+                        totalDiff += tempDiff;
+                        System.out.println();
+                        System.out.println("Please update " + input + "'s entry in initialize() and submit a pull request after this run.");
+                    }
+                    else { //Start error checking/core logic
+                        switch (input) {
+                            case "EE445L":
+                                embsys = true;
+                                break;
+                            case "EE460N":
+                                comparch = true;
+                                break;
+                            case "EE460R":
+                                vlsi = true;
+                                break;
+                            case "EE461S":
+                                os = true;
+                                break;
+                            case "EE351K":
+                                prob = true;
+                                break;
+                            case "EE422C":
+                                confirmation = getYN("Is Dr. Perry teaching EE422C?", sc);
+                                if (confirmation.equals("Y")) {
+                                    tempDiff -= 1.5;
+                                }
+                                break;
+                            case "EE411":
+                                confirmation = getYN("Is Dr. Swartzlander teaching EE411?", sc);
+                                if (confirmation.equals("Y")) {
+                                    tempDiff -= 2;
+                                }
+                                break;
+                            case "EE312":
+                                confirmation = getYN("Is Dr. Chase teaching EE312?", sc);
+                                if (confirmation.equals("Y")) {
+                                    tempDiff += 1;
+                                }
+                                break;
+                            case "EE302":
+                                confirmation = getYN("Did you do circuits in high school?", sc);
+                                if (confirmation.equals("N")) {
+                                    tempDiff += 1;
+                                }
+                                break;
+                            case "EE306":
+                                confirmation = getYN("Have you ever programmed?", sc);
+                                if (confirmation.equals("N")) {
+                                    tempDiff += 1;
+                                }
+                                confirmation = getYN("Is Dr. Patt teaching EE306?", sc);
+                                if (confirmation.equals("Y")) {
+                                    tempDiff += 1;
+                                }
+                                break;
+                            case "EE333T":
+                                confirmation = getYN("Is EE333T abroad?", sc);
+                                if (confirmation.equals("Y")) {
+                                    tempDiff -= 2.5;
+                                }
+                        }
+                        totalDiff += tempDiff;
+                    }
+                }
+                else { //If we are dealing with an EE379K course
+                    if (input.equals("EE379K")) {
+                        System.out.println("Please specify:");
+                        System.out.println("0: Smart Grids");
+                        System.out.println("1: High Throughput Nanopatterning");
+                        System.out.println("2: Information Security and Privacy");
+                        System.out.println("3: Data Science Laboratory");
+                        System.out.print(">");
+                        int choice = Integer.parseInt(sc.nextLine());
+                        if (choice == 0) {
+                            String temp = input + "0";
+                            tempDiff = allCourses.get(temp);
+                            totalDiff += tempDiff;
+                        }
+                        else {
+                            System.out.println("That version of EE379K is not in our database.");
+                            System.out.println("Please ask an upperclassman to rank it and enter the score here:");
+                            System.out.print(">");
+                            tempDiff = Double.parseDouble(sc.nextLine());
+                            totalDiff += tempDiff;
+                            System.out.println();
+                            System.out.println("Please add your course to initialize() as an incrementing 'EE379Kx' (x is currently 1) and submit a pull request after this run.");
+                        }
+                    }
+                    else { //If course is not defined in initialize method
+                        System.out.println(input + " is not in our database.");
+                        System.out.println("Please ask an upperclassman to rank it and enter the score here:");
+                        System.out.print(">");
+                        tempDiff = Double.parseDouble(sc.nextLine());
+                        totalDiff += tempDiff;
+                        System.out.println();
+                        System.out.println("Please add your course to initialize() and submit a pull request after this run.");
+                    }
+                }
+
+				/* Ask for next input */
+                System.out.print("\nNext >");
+                input = sc.nextLine();
+                input = input.replaceAll("\\s+","");
+                input = input.toUpperCase();
+            }
+
+            String fresh = getYN("Are you a freshman?", sc);
+            if (fresh.equals("Y")) {
+                riskyLow = 10;
+                nrLow = 14;
+                ded = 18;
+            }
+
+			/* Bermuda Triangle warning */
+            int bermuda = 0;
+            if (embsys) bermuda++;
+            if (comparch) bermuda++;
+            if (os) bermuda++;
+            if (bermuda > 1 || prob || vlsi) {
+                System.out.println();
+                System.out.println("The Bermuda Triangle of EE:");
+                System.out.println("EE460N");
+                System.out.println("EE445L");
+                System.out.println("EE461S");
+                System.out.println("Only take ONE of these at a time.");
+                if (prob)
+                    System.out.println("EE351K is manageable with ONE of the Bermuda Triangle.");
+                if (vlsi)
+                    System.out.println("EE460R can be considered equivalent to any of the Bermuda Triangle.");
+            }
+
+			/* Final score determined */
+            System.out.println("Your score is " + totalDiff);
+
+            if(totalDiff >= ded) {
+                System.out.println("ABORT ABORT ABORT");
+            } else if (totalDiff >= nrLow) {
+                System.out.println("Would not recommend.");
+            } else if (totalDiff >= riskyLow) {
+                System.out.println("Your schedule is a bit risky.");
+            } else {
+                System.out.println("U gud fam.");
+            }
+
+			/* Determine if repeat is desired */
+            String repeat = getYN("Would you like to test another schedule?", sc);
+            if (repeat.equals("N")) {
+                sc.close();
+                System.exit(0);
+            }
+        }
+    }
+
     /************************************************************
      * @name: initialize                                        *
      * @description: Prepare the list of course and their       *
      * weights for the rest of the script to utilize.           *
-     * @notes: Please send data for all the power courses!!!    *
+     * @notes: Update as needed!!!                              *
      * Courses for which a weight has not been determined have  *
      * been assigned a weight of -1.                            *
      ***********************************************************/
 
-	public static HashMap<String,Course> initialize() {
-			HashMap<String,Course> courses = new HashMap<String,Course>();
-			courses.put("EE445L", new Course("EE445L",7.5));
-			courses.put("EE460N", new Course("EE460N",6));
-			courses.put("EE445M", new Course("EE445M",5));
-			courses.put("EE461P", new Course("EE461P",3.5));
-			courses.put("EE461L", new Course("EE461L",2.5));
-			courses.put("EE422C", new Course("EE422C",2.5));
-			courses.put("EE464", new Course("EE464",2.5)); 
-			courses.put("EE445S", new Course("EE445S",-1));
-			courses.put("EE460M", new Course("EE460M",4));
-			courses.put("EE460J", new Course("EE460J",4.5));
-			courses.put("EE438", new Course("EE438",3.5));
-			courses.put("EE440", new Course("EE440",3.5));
-			courses.put("EE460R", new Course("EE460R",7));
-			courses.put("EE312", new Course("EE312",3));
-			courses.put("EE313", new Course("EE313",3));
-			courses.put("EE411", new Course("EE411",3)); 
-			courses.put("EE338L", new Course("EE338L",-1));
-			courses.put("EE302", new Course("EE302",2)); 
-			courses.put("EE306", new Course("EE306",2)); 
-			courses.put("EE462L", new Course("EE462L",4.5));
-			courses.put("EE471C", new Course("EE471C",-1));
-			courses.put("EE374K", new Course("EE374K",3.5));
-			courses.put("EE371R", new Course("EE371R",-1));
-			courses.put("EE361Q", new Course("EE361Q",1.5));
-			courses.put("EE360C", new Course("EE360C",4));
-			courses.put("EE360P", new Course("EE360P",3));
-			courses.put("EE361C", new Course("EE361C",3.5));
-			courses.put("EE362S", new Course("EE362S",2.5));
-			courses.put("EE363N", new Course("EE363N",-1));
-			courses.put("EE362Q", new Course("EE362Q",5));
-			courses.put("EE339", new Course("EE339",4));
-			courses.put("EE325", new Course("EE325",4.5));
-			courses.put("EE351K", new Course("EE351K",5.5));
-			courses.put("EE333T", new Course("EE333T",3.5)); 
-			courses.put("EE325K", new Course("EE325K",3.5));
-			courses.put("EE316", new Course("EE316",4));
-			courses.put("EE360T", new Course("EE360T",3));
-			courses.put("EE461S", new Course("EE461S",6));
-			courses.put("EE364", new Course("EE364",3)); 
-			courses.put("EE319K", new Course("EE319K",4));
-			courses.put("M408C", new Course("M408C",1.5));
-			courses.put("M408D", new Course("M408K",1.5));
-			courses.put("M408L", new Course("M408L",1.5));
-			courses.put("M408D", new Course("M408D",2));
-			courses.put("M408M", new Course("M408M",2));
-			courses.put("M427J", new Course("M427J",2.5));
-			courses.put("M427L", new Course("M427L",3));
-			courses.put("M340L", new Course("M340L",2.5));
-			courses.put("M325K", new Course("M325K",3));
-			courses.put("M328K", new Course("M328K",3));
-			courses.put("PHY303K", new Course("PHY303K",1));
-			courses.put("PHY103M", new Course("PHY103M",2));
-			courses.put("PHY303L", new Course("PHY303L",2));
-			courses.put("PHY103N", new Course("PHY103N",1));
-			courses.put("EE341", new Course("EE341", 5.5));
-			courses.put("EE369", new Course("EE369", 3));
-			courses.put("EE368L", new Course("EE368L", 4));
-			courses.put("EE379K0", new Course("EE379K0",2)); //Smart Grids.
-			courses.put("EE362K", new Course("EE362K", 3));
-			courses.put("EE339S", new Course("EE339S", 5));
-			courses.put("EE362R", new Course("EE362R", 1));
+    public static HashMap<String,Double> initialize() {
+        HashMap<String,Double> courses = new HashMap<>();
+        courses.put("EE445L",  7.5);
+        courses.put("EE460N",  6.0);
+        courses.put("EE445M",  5.0);
+        courses.put("EE461P",  3.5);
+        courses.put("EE461L",  2.5);
+        courses.put("EE422C",  2.5);
+        courses.put("EE464",   2.5);
+        courses.put("EE445S",  -1.0);
+        courses.put("EE460M",  4.0);
+        courses.put("EE460J",  4.5);
+        courses.put("EE438",   3.5);
+        courses.put("EE440",   3.5);
+        courses.put("EE460R",  7.0);
+        courses.put("EE362K",  2.5);
+        courses.put("EE312",   3.0);
+        courses.put("EE313",   3.0);
+        courses.put("EE411",   3.0);
+        courses.put("EE338L",  -1.0);
+        courses.put("EE302",   2.0);
+        courses.put("EE306",   2.0);
+        courses.put("EE462L",  4.5);
+        courses.put("EE471C",  -1.0);
+        courses.put("EE374K",  3.5);
+        courses.put("EE371R",  -1.0);
+        courses.put("EE361Q",  1.5);
+        courses.put("EE360C",  4.0);
+        courses.put("EE360P",  3.0);
+        courses.put("EE361C",  3.5);
+        courses.put("EE362S",  -1.0);
+        courses.put("EE363N",  -1.0);
+        courses.put("EE362Q",  -1.0);
+        courses.put("EE339",   4.0);
+        courses.put("EE325",   4.5);
+        courses.put("EE351K",  5.5);
+        courses.put("EE333T",  3.5);
+        courses.put("EE325K",  3.5);
+        courses.put("EE316",   4.0);
+        courses.put("EE360T",  3.0);
+        courses.put("EE461S",  6.0);
+        courses.put("EE364",   3.0);
+        courses.put("EE319K",  4.0);
+        courses.put("M408C",   1.5);
+        courses.put("M408D",   1.5);
+        courses.put("M408L",   1.5);
+        courses.put("M408D",   2.0);
+        courses.put("M408M",   2.0);
+        courses.put("M427J",   2.5);
+        courses.put("M427L",   3.0);
+        courses.put("M340L",   2.5);
+        courses.put("M325K",   3.0);
+        courses.put("M328K",   3.0);
+        courses.put("PHY303K", 1.0);
+        courses.put("PHY103M", 2.0);
+        courses.put("PHY303L", 2.0);
+        courses.put("PHY103N", 1.0);
+        courses.put("EE341",   5.5);
+        courses.put("EE369",   3.0);
+        courses.put("EE368L",  4.0);
+        courses.put("EE379K0", 2.0); //Smart Grids.
+        courses.put("EE362K", 3.0);
+        courses.put("EE339S", 5.0);
+        courses.put("EE362R", 1.0);
 
-			return courses;
-	}
+        return courses;
+    }
 
-	public static void main(String[] args) {
-		boolean rpt = true;
-		Scanner sc = new Scanner(System.in);
-		while (rpt){
-			HashMap<String,Course> allCourses = initialize();
-			
-			/* Values for the tiers */
-			double safe = 11.99;
-			double riskyLow = 12;
-			double riskyHigh = 15.99;
-			double nrLow = 16;
-			double nrHigh = 19.99;
-			double ded = 20;
+    /************************************************************
+     * @name: getYN                                             *
+     * @params: prompt, sc                                      *
+     * @description: Asks for confirmation from user for given  *
+     * prompt.                                                  *
+     ***********************************************************/
+    public static String getYN(String prompt, Scanner sc) {
+        boolean first = true;
+        String input;
 
-			/* Title screen stuff */
-			System.out.println("\nWelcome to UTECECourses.");
-			System.out.println("Please input your courses in the following format:");
-			System.out.println("[Department(EE,M,PHY)][Course number + optional letter]");
-			System.out.println("Example: EE445L");
-			System.out.println("For senior design, drop the letter.");
-			System.out.println("Please input your courses. Enter D when finished.\n");
-			System.out.print(">");
-			
-			/* Starred and Bermuda Triangle courses */
-			boolean embsys = false;
-			boolean comparch = false;
-			boolean os = false;
-			boolean vlsi = false;
-			boolean prob = false;
+        do {
+            if (!first) {
+                System.out.println("Y/N, dumbass.");
+            }
 
-			/* Intialize necessary variables */
-			String input = sc.nextLine();
-			input = input.toUpperCase();
-			input = input.replaceAll("\\s+","");
-			double totalDiff = 0;
-			double tempDiff;
+            System.out.println();
+            System.out.print(prompt);
+            System.out.println(" Y/N");
+            System.out.print(">");
 
-			/* Begin parsing */
-			while(!input.equals("D")) {
-				if (allCourses.containsKey(input))  {
-					//be able to get the course by here
-					Course c = allCourses.get(input);
-					tempDiff = c.getDiff();
-					/* For courses where an associated weight has yet to be determined */
-					if (tempDiff == -1) {
-						System.out.println("We do not have data for " + input + ".");
-						System.out.println("Please ask an upperclassman to rank it and enter the score here:");
-						System.out.print(">");
-						tempDiff = Double.parseDouble(sc.nextLine());
-						totalDiff += tempDiff;	
-						System.out.println();
-						System.out.println("Please update " + input + "'s entry in initialize() and submit a pull request after this run.");
-					}
-					else { //Start error checking/core logic
-						if (input.equals("EE445L")){
-							embsys = true;	
-						}
-						else if (input.equals("EE460N")) {
-							comparch = true;
-						}
-						else if (input.equals("EE460R")) {
-							vlsi = true;
-						}
-						else if (input.equals("EE461S")) {
-							os = true;
-						}
-						else if (input.equals("EE351K")) {
-							prob = true;
-						}
-						else if (input.equals("EE422C")) { //Perry exception
-							System.out.println();
-							System.out.println("Is Dr. Perry teaching EE422C? Y/N");
-							System.out.print(">");
-							input = sc.nextLine();
-							input = input.replaceAll("\\s+","");
-							input = input.toUpperCase();
-							while (!input.equals("Y") && !input.equals("N")) {
-								System.out.println();
-								System.out.println("Y/N, dumbass.");
-								System.out.println("Is Dr. Perry teaching EE422C? Y/N");
-								System.out.print(">");
-								input = sc.nextLine();
-								input = input.toUpperCase();
-								input = input.replaceAll("\\s+","");
-							}
-							if (input.equals("Y")) {
-								tempDiff -= 1.5;
-							}
-						}
-						else if (input.equals("EE312")) { //Chase exception
-							System.out.println();
-							System.out.println("Is Dr. Chase teaching EE312? Y/N");
-							System.out.print(">");
-							input = sc.nextLine();
-							input = input.replaceAll("\\s+","");
-							input = input.toUpperCase();
-							while (!input.equals("Y") && !input.equals("N")) {
-								System.out.println();
-								System.out.println("Y/N, dumbass.");
-								System.out.println("Is Dr. Chase teaching EE312? Y/N");
-								System.out.print(">");
-								input = sc.nextLine();
-								input = input.toUpperCase();
-								input = input.replaceAll("\\s+","");
-							}
-							if (input.equals("Y")) {
-								tempDiff += 1;
-							}
-						}
-						else if (input.equals("EE411")) { //Swartz exception
-							System.out.println();
-							System.out.println("Is Dr. Swartzlander teaching EE411? Y/N");
-							System.out.print(">");
-							input = sc.nextLine();
-							input = input.replaceAll("\\s+","");
-							input = input.toUpperCase();
-							while (!input.equals("Y") && !input.equals("N")) {
-								System.out.println();
-								System.out.println("Y/N, dumbass.");
-								System.out.println("Is Dr. Swartzlander teaching EE411? Y/N");
-								System.out.print(">");
-								input = sc.nextLine();
-								input = input.toUpperCase();
-								input = input.replaceAll("\\s+","");
-							}
-							if (input.equals("Y")) {
-								tempDiff -= 2;
-							}
-						}
-						else if (input.equals("EE302")) { //302 prior exp exception
-							System.out.println();
-							System.out.println("Did you do circuits in high school? Y/N");
-							System.out.print(">");
-							input = sc.nextLine();
-							input = input.replaceAll("\\s+","");
-							input = input.toUpperCase();
-							while (!input.equals("Y") && !input.equals("N")) {
-								System.out.println();
-								System.out.println("Y/N, dumbass.");
-								System.out.println("Did you do circuits in high school? Y/N");
-								System.out.print(">");
-								input = sc.nextLine();
-								input = input.toUpperCase();
-								input = input.replaceAll("\\s+","");
-							}
-							if (input.equals("N")) {
-								tempDiff += 1;
-							}
-						}
-						else if (input.equals("EE306")) { //306 prior exp exception
-							System.out.println();
-							System.out.println("Have you ever programmed? Y/N");
-							System.out.print(">");
-							input = sc.nextLine();
-							input = input.replaceAll("\\s+","");
-							input = input.toUpperCase();
-							while (!input.equals("Y") && !input.equals("N")) {
-								System.out.println();
-								System.out.println("Y/N, dumbass.");
-								System.out.println("Have you ever programmed? Y/N");
-								System.out.print(">");
-								input = sc.nextLine();
-								input = input.toUpperCase();
-								input = input.replaceAll("\\s+","");
-							}
-							if (input.equals("N")) {
-								tempDiff += 1;
-							}
-							System.out.println();
-							System.out.println("Is Dr. Patt teaching EE306? Y/N"); //Patt exception
-							System.out.print(">");
-							input = sc.nextLine();
-							input = input.replaceAll("\\s+","");
-							input = input.toUpperCase();
-							while (!input.equals("Y") && !input.equals("N")) {
-								System.out.println();
-								System.out.println("Y/N, dumbass.");
-								System.out.println("Is Dr. Patt teaching EE306? Y/N");
-								System.out.print(">");
-								input = sc.nextLine();
-								input = input.toUpperCase();
-								input = input.replaceAll("\\s+","");
-							}
-							if (input.equals("Y")) {
-								tempDiff += 1;
-							}
-						}
-						else if (input.equals("EE333T")) { //abroad exception
-							System.out.println();
-							System.out.println("Is EE333T abroad? Y/N");
-							System.out.print(">");
-							input = sc.nextLine();
-							input = input.replaceAll("\\s+","");
-							input = input.toUpperCase();
-							while (!input.equals("Y") && !input.equals("N")) {
-								System.out.println();
-								System.out.println("Y/N, dumbass.");
-								System.out.println("Is EE333 abroad? Y/N");
-								System.out.print(">");
-								input = sc.nextLine();
-								input = input.toUpperCase();
-								input = input.replaceAll("\\s+","");
-							}
-							if (input.equals("Y")) {
-								tempDiff -= 2.5;
-							}
-						}
-						
-						totalDiff += tempDiff;
-					}
-				} 
-				else { //If course is not defined in initialize method
-					if (input.equals("EE379K")) {
-							System.out.println("Please specify:");
-							System.out.println("0: Smart Grids");
-							System.out.println("1: High Throughput Nanopatterning");
-							System.out.println("2: Information Security and Privacy");
-							System.out.println("3: Data Science Laboratory");
-							System.out.print(">");
-							int choice = Integer.parseInt(sc.nextLine());
-							if (choice == 0) {
-								String temp = input + "0";
-								Course c = allCourses.get(temp);
-								tempDiff = c.getDiff();
-								totalDiff += tempDiff;
-							}
-							else {
-								System.out.println("That version of EE379K is not in our database.");
-								System.out.println("Please ask an upperclassman to rank it and enter the score here:");
-								System.out.print(">");
-								tempDiff = Double.parseDouble(sc.nextLine());
-								totalDiff += tempDiff;	
-								System.out.println();
-								System.out.println("Please add your course to initialize() as an incrementing 'EE379Kx' (x is currently 1) and submit a pull request after this run.");
-							}
-					}
-					else {
-						System.out.println(input + " is not in our database.");
-						System.out.println("Please ask an upperclassman to rank it and enter the score here:");
-						System.out.print(">");
-						tempDiff = Double.parseDouble(sc.nextLine());
-						totalDiff += tempDiff;	
-						System.out.println();
-						System.out.println("Please add your course to initialize() and submit a pull request after this run.");
-					}
-				}
+            input = sc.nextLine();
+            input = input.toUpperCase();
+            input = input.replaceAll("\\s+","");
 
-				/* Ask for next input */
-				System.out.print("\nNext >");
-				input = sc.nextLine();
-				input = input.replaceAll("\\s+","");
-				input = input.toUpperCase();
-			}	
+            first = false;
+        } while (!input.equals("Y") && !input.equals("N"));
 
-			System.out.println("\nAre you a freshman? Y/N");
-			System.out.print(">");
-			boolean freshman = false;
-
-			/* Adjust scale if user is a freshman */
-			String fresh = sc.nextLine();
-			fresh = fresh.toUpperCase();
-			fresh = fresh.replaceAll("\\s+","");
-			while (!fresh.equals("Y") && !fresh.equals("N")) {
-				System.out.println();
-				System.out.println("Y/N, dumbass.");
-				System.out.println("Are you a freshman? Y/N");
-				System.out.print(">");
-				fresh = sc.nextLine();
-				fresh = fresh.toUpperCase();
-				fresh = fresh.replaceAll("\\s+","");
-			}
-			
-			if (fresh.equals("Y")) {
-				freshman = true;
-			}
-			
-			if (freshman) {
-				safe = 9.99;
-				riskyLow = 10;
-				riskyHigh = 13.99;
-				nrLow = 14;
-				nrHigh = 17.99;
-				ded = 18;
-			}
-
-			/* Bermuda Triangle warning */
-			int bermuda = 0;
-			if (embsys) bermuda++;
-			if (comparch) bermuda++;
-			if (os) bermuda++;
-			if (bermuda > 1) {
-				System.out.println();
-				System.out.println("The Bermuda Triangle of EE:");
-				System.out.println("EE460N");
-				System.out.println("EE445L");
-				System.out.println("EE461S");
-				System.out.println("Only take ONE of these at a time.");
-				if (prob)
-					System.out.println("EE351K is manageable with ONE of the Bermuda Triangle.");
-				if (vlsi)	
-					System.out.println("EE460R can be considered equivalent to any of the Bermuda Triangle.");
-			}
-
-			/* Final score determined */
-			System.out.println("Your score is " + totalDiff);
-			
-			if (totalDiff <= safe) {
-				System.out.println("U gud fam.");	
-			}
-			else if (totalDiff >= riskyLow && totalDiff <= riskyHigh) {
-				System.out.println("Your schedule is a bit risky.");
-			}
-			else if (totalDiff >= nrLow && totalDiff <= nrHigh) {
-				System.out.println("Would not recommend.");
-			}
-			else if (totalDiff >= ded) {
-				System.out.println("ABORT ABORT ABORT");
-			}
-
-			/* Determine if repeat is desired */
-			System.out.println("\nWould you like to test another schedule? Y/N");
-			System.out.print(">");
-			boolean yn = false;
-			String yes = sc.nextLine();
-			yes = yes.toUpperCase();
-			yes = yes.replaceAll("\\s+","");
-			while (!yes.equals("Y") && !yes.equals("N")) {
-				System.out.println();
-				System.out.println("Y/N, dumbass.");
-				System.out.println("Would you like to test another schedule? Y/N");
-				System.out.print(">");
-				yes = sc.nextLine();
-				yes = yes.toUpperCase();
-				yes = yes.replaceAll("\\s+","");
-			}
-			
-			if (yes.equals("Y")) {
-				rpt = true;
-			}
-			else {
-				rpt = false;
-			}
-		}
-		sc.close();
-	}
+        return input;
+    }
 }
