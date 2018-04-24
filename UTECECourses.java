@@ -63,13 +63,13 @@ public class UTECECourses {
 			courses.put("PHY103M", new Course("PHY103M",2));
 			courses.put("PHY303L", new Course("PHY303L",2));
 			courses.put("PHY103N", new Course("PHY103N",1));
-			courses.put("EE341", new Course("EE341", 5.5);
-			courses.put("EE369", new Course("EE369", 3);
-			courses.put("EE368L", new Course("EE368L", 4);
-			courses.put("EE379K", new Course("EE379K",2); //Smart Grids.
-			courses.put("EE362K", new Course("EE362K", 3);
-			courses.put("EE339S", new Course("EE339S", 5);
-			courses.put("EE362R", new Course("EE362R", 1);
+			courses.put("EE341", new Course("EE341", 5.5));
+			courses.put("EE369", new Course("EE369", 3));
+			courses.put("EE368L", new Course("EE368L", 4));
+			courses.put("EE379K0", new Course("EE379K0",2)); //Smart Grids.
+			courses.put("EE362K", new Course("EE362K", 3));
+			courses.put("EE339S", new Course("EE339S", 5));
+			courses.put("EE362R", new Course("EE362R", 1));
 
 			return courses;
 	}
@@ -280,17 +280,44 @@ public class UTECECourses {
 								tempDiff -= 2.5;
 							}
 						}
+						
 						totalDiff += tempDiff;
 					}
 				} 
 				else {
-					System.out.println(input + " is not in our database.");
-					System.out.println("Please ask an upperclassman to rank it and enter the score here:");
-					System.out.print(">");
-					tempDiff = Double.parseDouble(sc.nextLine());
-					totalDiff += tempDiff;	
-					System.out.println();
-					System.out.println("Please add your course to initialize() and submit a pull request after this run.");
+					if (input.equals("EE379K")) {
+							System.out.println("Please specify:");
+							System.out.println("0: Smart Grids");
+							System.out.println("1: High Throughput Nanopatterning");
+							System.out.println("2: Information Security and Privacy");
+							System.out.println("3: Data Science Laboratory");
+							System.out.print(">");
+							int choice = Integer.parseInt(sc.nextLine());
+							if (choice == 0) {
+								String temp = input + "0";
+								Course c = allCourses.get(temp);
+								tempDiff = c.getDiff();
+								totalDiff += tempDiff;
+							}
+							else {
+								System.out.println("That version of EE379K is not in our database.");
+								System.out.println("Please ask an upperclassman to rank it and enter the score here:");
+								System.out.print(">");
+								tempDiff = Double.parseDouble(sc.nextLine());
+								totalDiff += tempDiff;	
+								System.out.println();
+								System.out.println("Please add your course to initialize() as an incrementing 'EE379Kx' (x is currently 1) and submit a pull request after this run.");
+							}
+					}
+					else {
+						System.out.println(input + " is not in our database.");
+						System.out.println("Please ask an upperclassman to rank it and enter the score here:");
+						System.out.print(">");
+						tempDiff = Double.parseDouble(sc.nextLine());
+						totalDiff += tempDiff;	
+						System.out.println();
+						System.out.println("Please add your course to initialize() and submit a pull request after this run.");
+					}
 				}
 				
 				System.out.println();
