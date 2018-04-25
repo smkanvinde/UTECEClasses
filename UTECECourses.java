@@ -159,7 +159,7 @@ public class UTECECourses {
         courses.put("EE364",   3.0);
         courses.put("EE319K",  4.0);
         courses.put("M408C",   1.5);
-        courses.put("M408D",   1.5);
+        courses.put("M408K",   1.5);
         courses.put("M408L",   1.5);
         courses.put("M408D",   2.0);
         courses.put("M408M",   2.0);
@@ -239,8 +239,7 @@ public class UTECECourses {
         if (bermuda.get("comparch")) bermudaCount++;
         if (bermuda.get("os")) bermudaCount++;
         if (bermudaCount > 1 || bermuda.get("prob") || bermuda.get("vlsi")) {
-            System.out.println();
-            System.out.println("The Bermuda Triangle of EE:");
+            System.out.println("\nThe Bermuda Triangle of EE:");
             System.out.println("EE460N");
             System.out.println("EE445L");
             System.out.println("EE461S");
@@ -388,8 +387,7 @@ public class UTECECourses {
                 System.out.println("Y/N, dumbass.");
             }
 
-            System.out.println();
-            System.out.print(prompt);
+            System.out.print("\n" + prompt);
             System.out.println(" Y/N");
             System.out.print(">");
 
@@ -405,7 +403,7 @@ public class UTECECourses {
 
     /************************************************************
      * @name: addWeight                                         *
-     * @params: prompt, sc                                      *
+     * @params: sc, course, defined                             *
      * @description: Asks user to enter info if course has no   *
      * assigned weight or if course is not in list.             *
      ***********************************************************/
