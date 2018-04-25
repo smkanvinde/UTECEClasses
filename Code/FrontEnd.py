@@ -1,7 +1,11 @@
 import sys
 from Code import ScheduleRater
 
-# This is the main #
+    #############################################################
+     # @name: main                                              #
+     # @description: All necessary logic for calculating        #
+     # schedule workload.                                       #
+     #############################################################
 rater = ScheduleRater.ScheduleRater()
 
 while True:
@@ -62,6 +66,7 @@ while True:
     else:
         print("U gud fam.")
 
+    # Check if repeat is desired #
     repeat = rater.getYN("Would you like to test another schedule?")
     if (repeat == "N"):
-        sys.exit()
+        sys.exit(0)

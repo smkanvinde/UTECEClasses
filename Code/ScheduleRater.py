@@ -8,13 +8,24 @@ class ScheduleRater:
     nrLow = 16
     ded = 20
 
-    #Initialization method to instantiate dicts above #
+    ##############################################################
+     # @name: __init__                                           #
+     # @description: Constructor.                                #
+     ##############################################################
     def __init__(self):
         # Course lists #
-        self.allCourses = self.courseListInitialize()
-        self.bermuda = self.bermudaInitialize()
+        self.allCourses = self.courseListInit()
+        self.bermuda = self.bermudaInit()
 
-    def courseListInitialize(self):
+   #############################################################
+    # @name: courseListInit                                    #
+    # @description: Prepare the list of courses and their      #
+    # weights for the rest of the script to utilize.           #
+    # @notes: Update as needed!!!                              #
+    # Courses for which a weight has not been determined have  #
+    # been assigned a weight of -1.                            #
+    #############################################################
+    def courseListInit(self):
         courses = dict()
         courses["EE445L"] = 7.5
         courses["EE460N"] = 6.0
@@ -81,7 +92,13 @@ class ScheduleRater:
 
         return courses
 
-    def bermudaInitialize(self):
+    #############################################################
+     # @name: bermudaInit                                       #
+     # @description: Prepare the list of starred and bermuda    #
+     # courses to use for logic in main.                        #
+     # @notes: Update as needed!!!                              #
+     #############################################################
+    def bermudaInit(self):
         bermudaCourses = dict()
 
         bermudaCourses["embsys"] = False
@@ -92,6 +109,13 @@ class ScheduleRater:
 
         return bermudaCourses
 
+    #############################################################
+     # @name: bermudaChecker                                    #
+     # @params: course                                          #
+     # @description: Updates the dict of bermuda courses should #
+     # the user have taken any of these courses.                #
+     # @notes: Update as needed!!!                              #
+     #############################################################
     def bermudaChecker(self, course):
         if course == "EE445L":
             self.bermuda["embsys"] = True
@@ -104,6 +128,12 @@ class ScheduleRater:
         elif course == "EE351K":
             self.bermuda["prob"] = True
 
+    #############################################################
+     # @name: bermudaHandler                                    #
+     # @description: Warns user if they took multiple bermudas  #
+     # or probability.                                          #
+     # @notes: Update as needed!!!                              #
+     #############################################################
     def bermudaHandler(self):
         bermudaCount = 0
         if (self.bermuda["embsys"] == True):
@@ -123,6 +153,14 @@ class ScheduleRater:
             if (self.bermuda["prob"]):
                 print("EE460R can be considered equivalent to any of the Bermuda Triangle.")
 
+    #############################################################
+     # @name: profException                                     #
+     # @params: course                                          #
+     # @description: Returns the delta weight for a course      #
+     # should taking a certain professor for a class affect     #
+     # that.                                                    #
+     # @notes: Update as needed!!!                              #
+     #############################################################
     def profException(self, course):
         if (course == "EE422C"):
             confirmation = self.getYN("Is Dr. Perry teaching EE422C?")
@@ -151,6 +189,13 @@ class ScheduleRater:
 
         return 0
 
+    #############################################################
+     # @name: priorExperience                                   #
+     # @params: course                                          #
+     # @description: Returns the delta weight according to the  #
+     # user's high school experience.                           #
+     # @notes: Update as needed!!!                              #
+     #############################################################
     def priorExperience(self, course):
         if (course == "EE302"):
             confirmation = self.getYN("Did you do circuits in high school?")
@@ -164,6 +209,12 @@ class ScheduleRater:
 
         return 0
 
+    #############################################################
+     # @name: freshmanHandler                                   #
+     # @description: Adjust the cutoffs should the user be a    #
+     # freshman.                                                #
+     # @notes: Update as needed!!!                              #
+     #############################################################
     def freshmanHandler(self):
         fresh = self.getYN("Are you a freshman?")
         if (fresh == "Y"):
@@ -171,6 +222,12 @@ class ScheduleRater:
             self.nrLow = 14
             self.ded = 18
 
+    #############################################################
+     # @name: handlerFor379K                                    #
+     # @description: Return the weight according to the         #
+     # specific 379K course that is being entered.              #
+     # @notes: Update as needed!!!                              #
+     #############################################################
     def handlerFor379K(self):
         print("Please specify:")
         print("0: Smart Grids")
@@ -179,21 +236,28 @@ class ScheduleRater:
         print("3: Data Science Laboratory")
         choice = input(">")
 
-        if (choice == 0):
+        if (choice == 0): #Should the 379K course be accounted for
             return self.allCourses["EE379K0"]
 
+        # Else ask user to add it #
         print("That version of EE379K is not in our database.")
         print("Please ask an upperclassman to rank it and enter the score here:")
         temp = input(">")
-        print("\nPlease add your course to initialize() as an incrementing 'EE379Kx' (x is currently 1) and submit a pull request after this run.")
+        print("\nPlease add your course to courseListInit() as an incrementing 'EE379Kx' (x is currently 1) and submit a pull request after this run.")
         return temp
 
+    #############################################################
+     # @name: getYN                                             #
+     # @params: prompt                                          #
+     # @description: Asks for confirmation from user for given  #
+     # prompt.                                                  #
+     #############################################################
     def getYN(self, prompt):
         first = True #If first entry
         entry = ""
 
         while not (entry == "Y" or entry == "N"):
-            if (not first):
+            if (not first): #Only ask for correct input if iteration #2 or later
                 print("Y/N, dumbass.")
 
             print("\n" + prompt + " Y/N")
@@ -206,12 +270,20 @@ class ScheduleRater:
 
         return entry
 
+    #############################################################
+     # @name: addWeight                                         #
+     # @params: course, defined                                 #
+     # @description: Asks user to enter info if course has no   #
+     # assigned weight or the course is not accounted for in    #
+     # the allCourses dict.                                     #
+     # @notes: Update as needed!!!                              #
+     #############################################################
     def addWeight(self, course, defined):
-        if (defined):
+        if (defined): #Course is in the dict, but no assigned weight
             print("We do not have data for " + course + ".")
             print("Please ask an upperclassman to rank it and enter the score here:")
             return input(">")
-        else:
+        else: #Course is not even considered
             print(course + " is not in our database.")
             print("Please ask an upperclassman to rank it and enter the score here:")
             return input(">")
