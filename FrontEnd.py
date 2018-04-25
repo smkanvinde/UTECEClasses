@@ -1,5 +1,5 @@
 import sys
-from Code import ScheduleRater
+import ScheduleRater
 
     #############################################################
      # @name: main                                              #
@@ -34,6 +34,7 @@ while True:
                 tempDiff += rater.profException(givenCourse) #Adjust the course depending on the professor taken
                 tempDiff += rater.priorExperience(givenCourse) #Account for high school experience
         else: #If we are dealing with an EE379K course
+            tempDiff = 0 #This is to reset the value so that we don't return 2*(the actual weight)
             if (givenCourse == "EE379K"):
                 tempDiff += rater.handlerFor379K()
             else:

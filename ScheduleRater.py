@@ -234,15 +234,16 @@ class ScheduleRater:
         print("1: High Throughput Nanopatterning")
         print("2: Information Security and Privacy")
         print("3: Data Science Laboratory")
-        choice = input(">")
+        choice = self.numCheck()
 
-        if (choice == 0): #Should the 379K course be accounted for
+        if (choice == float(0)): #Should the 379K course be accounted for
             return self.allCourses["EE379K0"]
 
         # Else ask user to add it #
         print("That version of EE379K is not in our database.")
         print("Please ask an upperclassman to rank it and enter the score here:")
-        temp = input(">")
+        temp = self.numCheck()
+
         print("\nPlease add your course to courseListInit() as an incrementing 'EE379Kx' (x is currently 1) and submit a pull request after this run.")
         return temp
 
@@ -282,8 +283,44 @@ class ScheduleRater:
         if (defined): #Course is in the dict, but no assigned weight
             print("We do not have data for " + course + ".")
             print("Please ask an upperclassman to rank it and enter the score here:")
-            return input(">")
+            return self.numCheck()
         else: #Course is not even considered
             print(course + " is not in our database.")
             print("Please ask an upperclassman to rank it and enter the score here:")
-            return input(">")
+            return self.numCheck()
+
+    #############################################################
+     # @name: errCheck                                          #
+     # @params: methodName, userInput                           #
+     # @description: Check if the input converts to a valid     #
+     # value and return a boolean accordingly.                  #
+     # @notes: Update as needed!!!                              #
+     #############################################################
+    def errCheck(self, methodName, userInput):
+        if (methodName == "addWeight"):
+            try:
+                float(userInput)
+                return True
+            except ValueError:
+                return False
+        elif (methodName == "handlerFor379K"):
+            try:
+                float(userInput)
+                return True
+            except ValueError:
+                return False
+
+    #############################################################
+     # @name: numCheck                                          #
+     # @description: Simply takes care of the error checking    #
+     # logic if a numerical input is desired.                   #
+     # @notes: Update as needed!!!                              #
+     #############################################################
+    def numCheck(self):
+        userIn = input(">")
+
+        while not self.errCheck("addWeight", userIn):
+            print("We want a number, genius.")
+            userIn = input(">")
+
+        return float(userIn)
