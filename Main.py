@@ -14,7 +14,7 @@ while True:
     print("[Department(EE,M,PHY)][Course number + optional letter]")
     print("Example: EE445L")
     print("For senior design, drop the letter.")
-    print("Please input your courses. Enter D when finished.\n");
+    print("Please input your courses. Enter D when finished.\n")
     givenCourse = input(">")
 
     # Setup for the meat of the code #
