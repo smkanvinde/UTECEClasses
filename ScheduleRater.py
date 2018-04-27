@@ -149,9 +149,9 @@ class ScheduleRater:
             print("EE445L")
             print("Only take ONE of these at a time.")
             if (self.bermuda["vlsi"]):
-                print("EE351K is manageable with ONE of the Bermuda Triangle.")
-            if (self.bermuda["prob"]):
                 print("EE460R can be considered equivalent to any of the Bermuda Triangle.")
+            if (self.bermuda["prob"]):
+                print("EE351K is manageable with ONE of the Bermuda Triangle.")
 
     #############################################################
      # @name: profException                                     #
@@ -200,7 +200,7 @@ class ScheduleRater:
         if (course == "EE302"):
             confirmation = self.getYN("Did you do circuits in high school?")
             if (confirmation == "N"):
-                return 1
+                return 1 
 
         elif (course == "EE306"):
             confirmation = self.getYN("Have you ever programmed?")
