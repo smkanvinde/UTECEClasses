@@ -1,6 +1,24 @@
 import java.util.*;
+import java.io.*;
+import java.net.*;
+import org.json.*;
+
 
 public class UTECECourses {
+
+    public static final String ANSI_RESET = "\u001B[0m";
+    public static final String ANSI_BLACK = "\u001B[30m";
+    public static final String ANSI_RED = "\u001B[31m";
+    public static final String ANSI_GREEN = "\u001B[32m";
+    public static final String ANSI_YELLOW = "\u001B[33m";
+    public static final String ANSI_BLUE = "\u001B[34m";
+    public static final String ANSI_PURPLE = "\u001B[35m";
+    public static final String ANSI_CYAN = "\u001B[36m";
+    public static final String ANSI_WHITE = "\u001B[37m";
+
+    private static void printError(String printThis) {System.out.println(ANSI_RED + printThis + ANSI_RESET); }
+    private static void printSucess(String printThis) {System.out.println(ANSI_GREEN + printThis + ANSI_RESET); }
+    private static void printMessage(String printThis) {System.out.println(ANSI_BLUE + printThis + ANSI_RESET); }
 
     /* Course list */
     protected static HashMap<String,Double> allCourses = courseListInitialize();
@@ -11,12 +29,37 @@ public class UTECECourses {
     protected static double nrLow = 16;
     protected static double ded = 20;
 
+    public static HashMap<String,Double> webCourseWeights() {
+        String tempCourses = getCourses("https://ece.yuriy.io/api/classes?fbclid=IwAR1ZP-FmirY16PVybbXQnUSxvzGeXaRpN6lTy5si1Qr_yIhiBCc_qAZb1Pc");
+        if(tempCourses == null) return null; 
+
+        JSONArray arr = new JSONArray(tempCourses);
+        HashMap<String,Double> webCourses = new HashMap<>();
+
+        for(int i = 0 ; i < arr.length(); i++){
+            JSONObject testObj = arr.getJSONObject(i);
+            webCourses.put(testObj.getString("code"), testObj.getDouble("rating") / 200.0);
+
+        }
+
+
+        return webCourses;
+    }
     /************************************************************
      * @name: main                                              *
      * @description: All necessary logic for calculating        *
      * schedule workload.                                       *
      ***********************************************************/
     public static void main(String[] args) {
+        printMessage("Connecting to the Web Server. This might take a few seconds");
+        HashMap<String,Double> webCourses = webCourseWeights();
+        if (webCourses != null ) {
+            allCourses = webCourses;
+            printSucess("Connection successful. Will use results from web server");
+        } else {
+            printError("Unable to to connect to the server. Will use pre set values instead");
+        }
+
         Scanner sc = new Scanner(System.in);
 
         while (true){
@@ -103,6 +146,25 @@ public class UTECECourses {
                 sc.close();
                 System.exit(0);
             }
+        }
+    }
+
+
+    public static String getCourses(String urlToRead) {
+        StringBuilder result = new StringBuilder();
+        try {
+            URL url = new URL(urlToRead);
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setRequestMethod("GET");
+            BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+            String line;
+            while ((line = rd.readLine()) != null) {
+                result.append(line);
+            }
+            rd.close();
+            return result.toString();
+        } catch (Exception e) {
+            return null;
         }
     }
 
