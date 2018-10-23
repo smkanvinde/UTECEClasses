@@ -386,9 +386,7 @@ public class UTECECourses {
         System.out.println("That version of EE379K is not in our database.");
         System.out.println("Please ask an upperclassman to rank it and enter the score here:");
         System.out.print(">");
-        validInput = false;
         double temp =legalInput(sc);
-
         System.out.println("\nPlease add your course to initialize() as an incrementing 'EE379Kx' (x is currently 1) and submit a pull request after this run.");
         return temp;
     }
@@ -409,7 +407,6 @@ public class UTECECourses {
                 System.out.println("Only positive numbers allowed as input here. Please try again");
                 System.out.print(">");
             }
-
         }
         return temp;
     }
@@ -455,7 +452,6 @@ public class UTECECourses {
             System.out.println("We do not have data for " + course + ".");
             System.out.println("Please ask an upperclassman to rank it and enter the score here:");
             System.out.print(">");
-
             return legalInput(sc);
         }
         else {
