@@ -1,6 +1,24 @@
 import java.util.*;
+import java.io.*;
+import java.net.*;
+import org.json.*;
+
 
 public class UTECECourses {
+
+    public static final String ANSI_RESET = "\u001B[0m";
+    public static final String ANSI_BLACK = "\u001B[30m";
+    public static final String ANSI_RED = "\u001B[31m";
+    public static final String ANSI_GREEN = "\u001B[32m";
+    public static final String ANSI_YELLOW = "\u001B[33m";
+    public static final String ANSI_BLUE = "\u001B[34m";
+    public static final String ANSI_PURPLE = "\u001B[35m";
+    public static final String ANSI_CYAN = "\u001B[36m";
+    public static final String ANSI_WHITE = "\u001B[37m";
+
+    private static void printError(String printThis) {System.out.println(ANSI_RED + printThis + ANSI_RESET); }
+    private static void printSucess(String printThis) {System.out.println(ANSI_GREEN + printThis + ANSI_RESET); }
+    private static void printMessage(String printThis) {System.out.println(ANSI_BLUE + printThis + ANSI_RESET); }
 
     /* Course list */
     protected static HashMap<String,Double> allCourses = courseListInitialize();
@@ -11,12 +29,37 @@ public class UTECECourses {
     protected static double nrLow = 16;
     protected static double ded = 20;
 
+    public static HashMap<String,Double> webCourseWeights() {
+        String tempCourses = getCourses("https://ece.yuriy.io/api/classes?fbclid=IwAR1ZP-FmirY16PVybbXQnUSxvzGeXaRpN6lTy5si1Qr_yIhiBCc_qAZb1Pc");
+        if(tempCourses == null) return null; 
+
+        JSONArray arr = new JSONArray(tempCourses);
+        HashMap<String,Double> webCourses = new HashMap<>();
+
+        for(int i = 0 ; i < arr.length(); i++){
+            JSONObject testObj = arr.getJSONObject(i);
+            webCourses.put(testObj.getString("code"), testObj.getDouble("rating") / 200.0);
+
+        }
+
+
+        return webCourses;
+    }
     /************************************************************
      * @name: main                                              *
      * @description: All necessary logic for calculating        *
      * schedule workload.                                       *
      ***********************************************************/
     public static void main(String[] args) {
+        printMessage("Connecting to the Web Server. This might take a few seconds");
+        HashMap<String,Double> webCourses = webCourseWeights();
+        if (webCourses != null ) {
+            allCourses = webCourses;
+            printSucess("Connection successful. Will use results from web server");
+        } else {
+            printError("Unable to to connect to the server. Will use pre set values instead");
+        }
+
         Scanner sc = new Scanner(System.in);
 
         while (true){
@@ -103,6 +146,25 @@ public class UTECECourses {
                 sc.close();
                 System.exit(0);
             }
+        }
+    }
+
+
+    public static String getCourses(String urlToRead) {
+        StringBuilder result = new StringBuilder();
+        try {
+            URL url = new URL(urlToRead);
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setRequestMethod("GET");
+            BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+            String line;
+            while ((line = rd.readLine()) != null) {
+                result.append(line);
+            }
+            rd.close();
+            return result.toString();
+        } catch (Exception e) {
+            return null;
         }
     }
 
@@ -354,10 +416,28 @@ public class UTECECourses {
         System.out.println("2: Information Security and Privacy");
         System.out.println("3: Data Science Laboratory");
         System.out.print(">");
-        int choice = Integer.parseInt(sc.nextLine());
+        int input = 0; 
+        boolean validInput = false;
+        String numberInput = "";
+        while (!validInput) {
+            try {
+                numberInput = sc.nextLine();
+                input = Integer.parseInt(numberInput);
+                validInput = false;
+                if (input > 0) 
+                    validInput = true;
+            } catch (Exception e) {
+                validInput = false;
+            }
 
+            if (!validInput) {
+                System.out.println("Only positive integers allowed as input here. Please try again");
+                System.out.print(">");
+            }
+
+        }
         /* If it's a choice that exists, return that value */
-        switch(choice) {
+        switch(input ) {
             case 0:
                 return allCourses.get("EE379K0");
             default:
@@ -368,8 +448,28 @@ public class UTECECourses {
         System.out.println("That version of EE379K is not in our database.");
         System.out.println("Please ask an upperclassman to rank it and enter the score here:");
         System.out.print(">");
-        double temp = Double.parseDouble(sc.nextLine()); //Just to make sure below line prints properly
+        double temp =legalInput(sc);
         System.out.println("\nPlease add your course to initialize() as an incrementing 'EE379Kx' (x is currently 1) and submit a pull request after this run.");
+        return temp;
+    }
+
+    private static double legalInput(Scanner sc){
+        boolean validInput = false;
+        double temp =0;
+        while (!validInput) {
+            try {
+                temp = Double.parseDouble(sc.nextLine());
+                if ( temp > 0.0 )
+                    validInput = true;
+
+            } catch (Exception e) {
+                validInput = false;
+            }
+            if (!validInput) {
+                System.out.println("Only positive numbers allowed as input here. Please try again");
+                System.out.print(">");
+            }
+        }
         return temp;
     }
 
@@ -414,13 +514,13 @@ public class UTECECourses {
             System.out.println("We do not have data for " + course + ".");
             System.out.println("Please ask an upperclassman to rank it and enter the score here:");
             System.out.print(">");
-            return Double.parseDouble(sc.nextLine());
+            return legalInput(sc);
         }
         else {
             System.out.println(course + " is not in our database.");
             System.out.println("Please ask an upperclassman to rank it and enter the score here:");
             System.out.print(">");
-            return Double.parseDouble(sc.nextLine());
+            return legalInput(sc);
         }
     }
 }
