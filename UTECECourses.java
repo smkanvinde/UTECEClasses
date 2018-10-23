@@ -354,10 +354,28 @@ public class UTECECourses {
         System.out.println("2: Information Security and Privacy");
         System.out.println("3: Data Science Laboratory");
         System.out.print(">");
-        int choice = Integer.parseInt(sc.nextLine());
+        int input = 0; 
+        boolean validInput = false;
+        String numberInput = "";
+        while (!validInput) {
+            try {
+                numberInput = sc.nextLine();
+                input = Integer.parseInt(numberInput);
+                validInput = false;
+                if (input > 0) 
+                    validInput = true;
+            } catch (Exception e) {
+                validInput = false;
+            }
 
+            if (!validInput) {
+                System.out.println("Only positive integers allowed as input here. Please try again");
+                System.out.print(">");
+            }
+
+        }
         /* If it's a choice that exists, return that value */
-        switch(choice) {
+        switch(input ) {
             case 0:
                 return allCourses.get("EE379K0");
             default:
@@ -368,8 +386,31 @@ public class UTECECourses {
         System.out.println("That version of EE379K is not in our database.");
         System.out.println("Please ask an upperclassman to rank it and enter the score here:");
         System.out.print(">");
-        double temp = Double.parseDouble(sc.nextLine()); //Just to make sure below line prints properly
+        validInput = false;
+        double temp =legalInput(sc);
+
         System.out.println("\nPlease add your course to initialize() as an incrementing 'EE379Kx' (x is currently 1) and submit a pull request after this run.");
+        return temp;
+    }
+
+    private static double legalInput(Scanner sc){
+        boolean validInput = false;
+        double temp =0;
+        while (!validInput) {
+            try {
+                temp = Double.parseDouble(sc.nextLine());
+                if ( temp > 0.0 )
+                    validInput = true;
+
+            } catch (Exception e) {
+                validInput = false;
+            }
+            if (!validInput) {
+                System.out.println("Only positive numbers allowed as input here. Please try again");
+                System.out.print(">");
+            }
+
+        }
         return temp;
     }
 
@@ -414,13 +455,14 @@ public class UTECECourses {
             System.out.println("We do not have data for " + course + ".");
             System.out.println("Please ask an upperclassman to rank it and enter the score here:");
             System.out.print(">");
-            return Double.parseDouble(sc.nextLine());
+
+            return legalInput(sc);
         }
         else {
             System.out.println(course + " is not in our database.");
             System.out.println("Please ask an upperclassman to rank it and enter the score here:");
             System.out.print(">");
-            return Double.parseDouble(sc.nextLine());
+            return legalInput(sc);
         }
     }
 }
